@@ -1,6 +1,6 @@
 
 dM0_nb <- nimbleFunction (
-  run = function (x   = integer(2),
+  run = function (x   = double(2),
                   mu  = double(),
                   p   = double(),
                   r   = double(),
@@ -41,11 +41,47 @@ dM0_nb <- nimbleFunction (
 })
 
 
+rM0_nb <- nimbleFunction(
+  run = function(n  = integer(),
+                 mu = double(),
+                 p  = double(),
+                 r  = double(),
+                 J  = integer(), 
+                 R  = integer()) {
 
-dM0_nb(x   = ymat,
-       mu  = log(mut),
-       p   = logit(pt),
-       r   = log(rt),
-       R   = R,
-       J   = J,
-       log = FALSE)
+    
+    prob <- double(J + 1)
+    for (i in 1:(J)) {
+      prob[i] <- pow(1 - p, i - 1) * p
+    }
+    prob[J + 1] <- 1 - sum(prob[1:J])
+
+    ans <- matrix(0, nrow = R, ncol = J + 1)
+    for (i in 1:R) {
+      n <- rnbinom(n = 1, size = r, mu = mu)
+      if (n > 0) {
+        ans[i, ] <- rmulti(n = 1, size = n, prob = prob)
+      }
+    }
+
+    return(ans[ , 1:J])
+    returnType(integer(2))
+})
+
+registerDistributions(list(
+  dM0_nb = list(
+    BUGSdist = "dM0_nb(mu, p, r, J, R)",
+    Rdist = "dM0_nb(mu, p, r, J, R)",
+    discrete = TRUE,
+    types = c('value = double(2)',
+              'mu = double()',
+              'p = double()',
+              'r = double()',
+              'J = integer()',
+              'R = integer()'
+              ),
+    mixedSizes = FALSE,
+    pqAvail = FALSE
+  )), verbose = F
+)
+
