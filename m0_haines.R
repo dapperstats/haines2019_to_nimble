@@ -30,6 +30,7 @@ gM0nb <- function (param) {
 
 }
 
+
 # generate with negbin mixing
 # edited to transform the parameters so as to align with density function
 gM0nbgen <- function (param) {

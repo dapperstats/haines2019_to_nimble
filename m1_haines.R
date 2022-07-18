@@ -23,7 +23,7 @@ gM1nb <- function (param) {
   xb <- b0 + b1 * xvec
   mu <- exp(xb)
 
-  loglik <- 0
+  loglik <- -ylogfact
 
   for (i in 1:R) {
 
@@ -38,15 +38,6 @@ gM1nb <- function (param) {
   return(-loglik)
 }
 
-# fit poisson
-
-gM1pc <- function (param) { 
-  p       <- expit(param)
-  ptot    <- 1 - (1 - p)^J
-  loglikc <- ytot * log(p) + ysumj * log(1 - p) - ytot * log(ptot)
-
-  return(-loglikc)
-}
 
 
 # generate with negbin 
@@ -55,8 +46,8 @@ gM1nbgen <- function (param) {
 
   b0 <- param[1]
   b1 <- param[2]
-  p  <- param[3]
-  r  <- param[4]
+  p  <- expit(param[3])
+  r  <- exp(param[4])
   ymat <- matrix(0, R, J + 1)
   prob <- c(p, (1 - p) * p,(1 - p)^2 * p, (1 - p)^3)
 
