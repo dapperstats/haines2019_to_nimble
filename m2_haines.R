@@ -6,12 +6,12 @@ logit <- function(x){ log(x/(1-x)) }
 expit <- function(x){ exp(x)/(1+exp(x)) }
 
 ##########################################
-# Model 1: site covariates for abundance #
+# Model 1: site covariates for capture   #
 ##########################################
 
 # fit negative binomial
 
-gM1nb <- function (param) {
+gM2nb <- function (param) {
 
   b0     <- (param[1])
   b1     <- (param[2])
@@ -42,7 +42,7 @@ gM1nb <- function (param) {
 
 # generate with negbin 
 
-gM1nbgen <- function (param) {
+gM2nbgen <- function (param) {
 
   b0 <- param[1]
   b1 <- param[2]
@@ -62,5 +62,6 @@ gM1nbgen <- function (param) {
 
   return(ymat)
 }
+
 
 
