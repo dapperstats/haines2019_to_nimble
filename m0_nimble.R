@@ -3,6 +3,8 @@
 #   assuming a rectangular  matrix of observations
 #   but generalizing to allow more flexibles
 
+# this formulation assumes that the whole matrix of observations is dependent
+
 dM0_nb <- nimbleFunction (
   run = function (x   = double(2),
                   mu  = double(),
@@ -25,7 +27,7 @@ dM0_nb <- nimbleFunction (
 
   x_tot  <- sum(x)
   x_vec  <- seq(0, J - 1)
-  x_sumj <-  sum(x_miss_row[1:R]) 
+  x_sumj <- sum(x_miss_row[1:R]) 
 
   x_logfact     <- sum(lfactorial(x))
   x_row_logfact <- sum(lfactorial(x_row))
