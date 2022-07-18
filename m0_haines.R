@@ -18,7 +18,7 @@ gM0nb <- function (param) {
   p      <- expit(param[2])
   r      <- exp(param[3])
 
-  ptot   <- 1-(1-p)^J
+  ptot   <- 1 - (1 - p)^J
 
   term1  <- sum(lgamma(r + yrow)) - R * lgamma(r) - yrlogfact
   term2  <- R * r * log(r) + ytot * log(mu)
@@ -57,80 +57,58 @@ gM0nbgen <- function (param) {
 # negative binomial bootstraps
 # setting
 
-R  <- 20
-J  <- 3
+#R  <- 20
+#J  <- 3
 
-set.seed <- 125
+#set.seed <- 125
 
 # parameters
 
-pt  <- 0.615
-mut <- 28.048
-rt  <- 11.415
+#pt  <- 0.615
+#mut <- 28.048
+#rt  <- 11.415
 
 # simulations
 
-nsim   <- 10000
-nprint <- 1000
-muvec  <- matrix(0,nsim,1)
-pvec   <- matrix(0,nsim,1)
-rvec   <- matrix(0,nsim,1)
+#nsim   <- 10000
+#nprint <- 1000
+#muvec  <- matrix(0,nsim,1)
+#pvec   <- matrix(0,nsim,1)
+#rvec   <- matrix(0,nsim,1)
 
-for (isim in 1:nsim) {
+#for (isim in 1:nsim) {
 
   # generate
 
-  param <- c(mut, pt, rt)
-  ymat  <- gM0nbgen(param)
+#  param <- c(mut, pt, rt)
+#  ymat  <- gM0nbgen(param)
 
   # organize data
 
-  yrow      <- as.matrix(rowSums(ymat))
-  ycol      <- as.matrix(colSums(ymat))
-  ytot      <- sum(sum(ymat))
-  jvec      <- seq(0, J - 1)
-  ysumj     <- sum(ycol * jvec)
-  ylogfact  <- sum(sum(log(factorial(ymat))))
-  yrlogfact <- sum(log(factorial(yrow)))
+#  yrow      <- as.matrix(rowSums(ymat))
+#  ycol      <- as.matrix(colSums(ymat))
+#  ytot      <- sum(sum(ymat))
+#  jvec      <- seq(0, J - 1)
+#  ysumj     <- sum(ycol * jvec)
+#  ylogfact  <- sum(sum(log(factorial(ymat))))
+#  yrlogfact <- sum(log(factorial(yrow)))
 
   # MLE
 
-  param0 <- c(log(mut), logit(pt), log(rt))
-  finopt <- optim(param0, gM0nb, method="Nelder-Mead")
+#  param0 <- c(log(mut), logit(pt), log(rt))
+#
+#  finopt <- optim(param0, gM0nb, method="Nelder-Mead")
+#
+#  muvec[isim] <- exp(finopt$par[1])
+#  pvec[isim]  <- expit(finopt$par[2])
+#  rvec[isim]  <- exp(finopt$par[3])
+#
+#  if (trunc(isim / nprint) * nprint == isim) {
+#    print(isim)
+#  }
+#
+#}
 
-  muvec[isim] <- exp(finopt$par[1])
-  pvec[isim]  <- expit(finopt$par[2])
-  rvec[isim]  <- exp(finopt$par[3])
-
-  if (trunc(isim / nprint) * nprint == isim) {
-    print(isim)
-  }
-
-}
 
 
-#mu
-mean(muvec)
-sd(muvec)
-quantile(muvec,c(.025,.975))
-
-#p
-mean(pvec)
-sd(pvec)
-quantile(pvec,c(.025,.975))
-
-#r
-mean(rvec)
-sd(rvec)
-quantile(rvec,c(.025,.975))
-
-#summaries
-summary(muvec)
-summary(pvec)
-summary(rvec)
-
-# histograms
-hist(muvec)
-hist(pvec)
-hist(rvec)
 

@@ -2,10 +2,8 @@
 # multinomial negative binomial mixture model, assuming a vector of observations with indexing based on length vector
 #
 
-# working here! the randomizer function works great
-# need to isolate the "colSum" to figure out how to update the code
 
-dM0_nb <- nimbleFunction (
+dM0_nb_vec <- nimbleFunction (
   run = function (x   = double(1),
                   mu  = double(),
                   p   = double(),
@@ -14,9 +12,43 @@ dM0_nb <- nimbleFunction (
                   R   = integer(),
                   log = logical(0, default = 0)) {
 
+  xtot       <- sum(x)
+  ptot       <- double(R)
+  x_row      <- integer(R)
+  x_miss_row <- integer(R)
 
-  if (log) return(logProb)
-  else return(exp(logProb))
+  for (i in 1:R) {
+
+    spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]) - J_i[i] + J_i[i])
+    ptot[i]       <- 1 - (1 - p)^J_i[i]
+    x_row[i]      <- sum(x[spots_in])
+    x_miss_row[i] <- x[spots_in] %*% seq(0, J_i[i] - 1)
+
+  }
+
+  x_sumj <- sum(x_miss_row[1:R]) 
+  x_logfact     <- sum(lfactorial(x))
+  x_row_logfact <- sum(lfactorial(x_row))
+
+  loglik <- (-x_row_logfact)
+
+  for (i in 1:R) {
+
+    spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]) - J_i[i] + J_i[i])
+
+    x_vec  <- seq(0, J_i[i] - 1)
+
+    term1  <- sum(lgamma(r + x_row[i])) - lgamma(r) 
+    term2  <- r * log(r) + x_row[i] * log(mu)
+    term3  <- x_row[i] * log(p) + sum(x[spots_in] * x_vec) * log(1 - p)
+    term4  <-  -(x_row[i] + r) * log(r + mu * ptot[i])
+
+    loglik <- loglik + term1 + term2 + term3 + term4
+
+  }
+
+  if (log) return(loglik)
+  else return(exp(loglik))
   returnType(double())    
 
 })
@@ -64,3 +96,21 @@ rM0_nb_vec <- nimbleFunction(
     return(ans[retain])
     returnType(double(1))
 })
+
+
+registerDistributions(list(
+  dM0_nb_vec = list(
+    BUGSdist = "dM0_nb_vec(mu, p, r, J_i, R)",
+    Rdist = "dM0_nb_vec(mu, p, r, J_i, R)",
+    discrete = TRUE,
+    types = c('value = double(1)',
+              'mu = double()',
+              'p = double()',
+              'r = double()',
+              'J = integer(1)',
+              'R = integer()'
+              ),
+    mixedSizes = FALSE,
+    pqAvail = FALSE
+  )), verbose = F
+)

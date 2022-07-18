@@ -13,7 +13,7 @@ dM0_nb <- nimbleFunction (
                   log = logical(0, default = 0)) {
 
 
-  ptot <- 1 - (1 - p) ^ J
+  ptot <- 1 - (1 - p)^J
 
   x_row      <- integer(R)
   x_miss_row <- integer(R)
@@ -29,7 +29,6 @@ dM0_nb <- nimbleFunction (
 
   x_logfact     <- sum(lfactorial(x))
   x_row_logfact <- sum(lfactorial(x_row))
-
 
   term1   <- sum(lgamma(r + x_row)) - R * lgamma(r) - x_row_logfact
   term2   <- R * r * log(r) + x_tot * log(mu)
