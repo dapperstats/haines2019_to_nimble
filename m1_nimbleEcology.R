@@ -1,28 +1,33 @@
 ####################################################
 #                                                  #
-# Model 0:                                         #
+# Model 1:                                         #
 #          multinomial negative binomial N-mixture #
 #                                                  #
-#          constant mu                             # 
+#          covariates for mu                       # 
 #          constant p                              #
 #                                                  #
 #          single site                             #
 #                                                  #
 ####################################################
 
-dNmixture_MNB_s <- nimbleFunction(
+dNmixture_MNB_sitecovar_s <- nimbleFunction(
     run = function(x   = double(1),
-                   mu  = double(),
+                   b0  = double(),
+                   b1  = double(),
                    p   = double(),
                    r   = double(),
                    J   = integer(),
+                   z   = double(),
                    log = integer(0, default = 0)) {
+
+  zb  <- log(b0) + b1 * z # "log mu"
+  mu  <- exp(zb)
 
   x_tot <- sum(x)
   x_miss <- sum(x * seq(0, J - 1))
 
   term1   <- lgamma(r + x_tot) - lgamma(r) - sum(lfactorial(x))
-  term2   <- r * log(r) + x_tot * log(mu)
+  term2   <- r * log(r) + x_tot * zb
   term3   <- x_tot * log(p) + x_miss * log(1 - p)
   term4   <- -(x_tot + r) * log(r + mu * (1 - (1 - p) ^ J))
   logProb <- term1 + term2 + term3 + term4

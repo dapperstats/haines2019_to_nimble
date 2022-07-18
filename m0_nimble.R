@@ -32,7 +32,7 @@ dM0_nb <- nimbleFunction (
   x_logfact     <- sum(lfactorial(x))
   x_row_logfact <- sum(lfactorial(x_row))
 
-  term1   <- sum(lgamma(r + x_row)) - R * lgamma(r) - x_row_logfact
+  term1   <- sum(lgamma(r + x_row)) - R * lgamma(r) - x_logfact
   term2   <- R * r * log(r) + x_tot * log(mu)
   term3   <- x_tot * log(p) + x_sumj * log(1 - p)
   term4   <- -(x_tot + R * r) * log(r + mu * ptot)

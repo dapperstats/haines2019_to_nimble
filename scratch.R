@@ -62,11 +62,11 @@ b1t <- b1
 
 param <- c(b0t, b1t, pt, rt)
 xvec <- read.table("xvec50.txt")
-xvec <- as.matrix(xvec)
+xvec <- as.matrix(xvec)[1]
 
-R <- 50
+R <- 1
 J <- 3
-ymat  <- gM1nbgen(param)
+ymat  <- matrix(gM1nbgen(param), ncol = 3)
 
   yrow      <- rowSums(ymat)
   ycol      <- colSums(ymat)
@@ -80,4 +80,12 @@ param0 <- c(b0t, b1t, pt, rt)
 gM1nb(param0)
 
 dM1_nb(ymat, b0, b1, p, r, J, R, xvec,TRUE)
+
+ymatv <- as.numeric(ymat)
+
+dNmixture_MNB_sitecovar_s(ymatv, b0, b1, p, r, J, xvec,TRUE)
+
+
+
+
 

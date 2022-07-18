@@ -9,6 +9,8 @@ expit <- function(x){ exp(x)/(1+exp(x)) }
 ####################################
 # Model 0: constant mu, constant p #
 ####################################
+# note that the "yrlogfact" has been replaced with "ylogfact" to match 
+# the math and mathematica code
 
 # fit negative binomial
  
@@ -20,7 +22,7 @@ gM0nb <- function (param) {
 
   ptot   <- 1 - (1 - p)^J
 
-  term1  <- sum(lgamma(r + yrow)) - R * lgamma(r) - yrlogfact
+  term1  <- sum(lgamma(r + yrow)) - R * lgamma(r) - ylogfact
   term2  <- R * r * log(r) + ytot * log(mu)
   term3  <- ytot * log(p) + ysumj * log(1-p)
   term4  <- -(ytot + R * r) * log(r + mu * ptot)

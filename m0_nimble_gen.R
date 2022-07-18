@@ -28,9 +28,8 @@ dM0_nb_vec <- nimbleFunction (
 
   x_sumj <- sum(x_miss_row[1:R]) 
   x_logfact     <- sum(lfactorial(x))
-  x_row_logfact <- sum(lfactorial(x_row))
 
-  loglik <- (-x_row_logfact)
+  loglik <- (-x_logfact) 
 
   for (i in 1:R) {
 
