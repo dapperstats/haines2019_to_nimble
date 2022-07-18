@@ -44,10 +44,17 @@ dNmixture_MNB_s(ymat[1, ], mu, p, r, J, TRUE)
 dM0_nb(ymat[1, , drop = FALSE], mu, p, r, J, 1, TRUE)
 
 
+set.seed(123)
+rM0_nb(1, mu, p, r, J, R)
+set.seed(123)
+rNmixture_MNB_s(1, mu, p, r, J)
+
+
 # M1
 
 source("m1_haines.R")
 source("m1_nimble.R")
+source("m1_nimbleEcology.R")
 
 
 p   <- 0.61
@@ -84,6 +91,14 @@ dM1_nb(ymat, b0, b1, p, r, J, R, xvec,TRUE)
 ymatv <- as.numeric(ymat)
 
 dNmixture_MNB_sitecovar_s(ymatv, b0, b1, p, r, J, xvec,TRUE)
+
+
+set.seed(123)
+rM1_nb(1, b0, b1, p, r, J, R, xvec)
+
+set.seed(123)
+rNmixture_MNB_sitecovar_s(1, b0, b1, p, r, J, xvec)
+
 
 
 

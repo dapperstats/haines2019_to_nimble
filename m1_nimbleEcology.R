@@ -39,14 +39,19 @@ dNmixture_MNB_sitecovar_s <- nimbleFunction(
 })
 
 
-rNmixture_MNB_s <- nimbleFunction(
+rNmixture_MNB_sitecovar_s <- nimbleFunction(
   run = function(n  = integer(),
-                 mu = double(),
+                 b0  = double(),
+                 b1  = double(),
                  p  = double(),
                  r  = double(),
-                 J  = integer()) {
+                 J  = integer(),
+                 z   = double()) {
 
-    
+
+    zb  <- log(b0) + b1 * z
+    mu  <- exp(zb)
+        
     prob <- double(J + 1)
     for (i in 1:(J)) {
       prob[i] <- pow(1 - p, i - 1) * p
@@ -64,15 +69,17 @@ rNmixture_MNB_s <- nimbleFunction(
 })
 
 registerDistributions(list(
-  dNmixture_MNB_s = list(
-    BUGSdist = "dNmixture_MNB_s(mu, p, r, J)",
-    Rdist = "dNmixture_MNB_s(mu, p, r, J)",
+  dNmixture_MNB_sitecovar_s = list(
+    BUGSdist = "dNmixture_MNB_sitecovar_s(b1, b0, p, r, J, z)",
+    Rdist = "dNmixture_MNB_sitecovar_s(b1, b0, p, r, J, z)",
     discrete = TRUE,
     types = c('value = double(1)',
-              'mu = double()',
+              'b0 = double()',
+              'b1 = double()',
               'p = double()',
               'r = double()',
-              'J = integer()'
+              'J = integer()',
+              'z = double()'
               ),
     mixedSizes = FALSE,
     pqAvail = FALSE
