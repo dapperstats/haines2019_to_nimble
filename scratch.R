@@ -3,12 +3,13 @@ library(nimble)
 source("m0_haines.R")
 source("m0_nimble.R")
 source("m0_nimble_gen.R")
+source("m0_nimbleEcology.R")
 
 #source("m1_haines.R")
 
 # work space for playing out model dev
 
-R  <- 20
+R  <- 1
 J  <- 3
 J_i <- rep(J, R)
 set.seed(125)
@@ -23,7 +24,7 @@ rt  <- log(r)
 
 param <- c(mut, pt, rt)
 
-ymat  <- gM0nbgen(param)
+ymat  <- matrix(gM0nbgen(param),nrow = 1, ncol = 3)
 ymatv <- as.numeric(t(ymat))
 
 
@@ -40,6 +41,10 @@ gM0nb(param)
 
 dM0_nb(ymat, mu, p, r, J, R, TRUE)
 dM0_nb_vec(ymatv, mu, p, r, J_i, R, TRUE)
+
+
+dNmixture_MNB_s(ymat[1, ], mu, p, r, J, TRUE)
+dM0_nb(ymat[1, , drop = FALSE], mu, p, r, J, 1, TRUE)
 
 
 
