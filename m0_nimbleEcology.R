@@ -1,8 +1,13 @@
 ####################################################
+#                                                  #
 # Model 0:                                         #
 #          multinomial negative binomial N-mixture #
+#                                                  #
 #          constant mu                             # 
-#           constant p                             #
+#          constant p                              #
+#                                                  #
+#          single site                             #
+#                                                  #
 ####################################################
 
 dNmixture_MNB_s <- nimbleFunction(
@@ -16,15 +21,9 @@ dNmixture_MNB_s <- nimbleFunction(
 
   ptot <- 1 - (1 - p)^J
 
-  x_row      <- integer(R)
-  x_miss_row <- integer(R)
+  x_row      <- sum(x)
+  x_miss_row <- x %*% seq(0, J - 1)
 
-  for (i in 1:R) {
-    x_row[i]      <- sum(x[i, ])
-    x_miss_row[i] <- x[i, ] %*% seq(0, J - 1)
-  }
-
-  x_tot  <- sum(x)
   x_vec  <- seq(0, J - 1)
   x_sumj <- sum(x_miss_row[1:R]) 
 

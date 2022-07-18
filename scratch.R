@@ -4,7 +4,7 @@ source("m0_haines.R")
 source("m0_nimble.R")
 source("m0_nimble_gen.R")
 
-source("m1_haines.R")
+#source("m1_haines.R")
 
 # work space for playing out model dev
 
@@ -13,11 +13,16 @@ J  <- 3
 J_i <- rep(J, R)
 set.seed(125)
 
-pt  <- 0.615
-mut <- 28.048
-rt  <- 11.415
+p   <- 0.61
+mu  <- 28.048
+r   <- 11.415
+pt  <- logit(p)
+mut <- log(mu)
+rt  <- log(r)
+
 
 param <- c(mut, pt, rt)
+
 ymat  <- gM0nbgen(param)
 ymatv <- as.numeric(t(ymat))
 
@@ -30,12 +35,11 @@ ymatv <- as.numeric(t(ymat))
   ylogfact  <- sum(sum(log(factorial(ymat))))
   yrlogfact <- sum(log(factorial(yrow)))
 
-param0 <- c(log(mut), logit(pt), log(rt))
-gM0nb(param0)
+gM0nb(param)
 
 
-dM0_nb(ymat, mut, pt, rt, J, R, TRUE)
-dM0_nb_vec(ymatv, mut, pt, rt, J_i, R, TRUE)
+dM0_nb(ymat, mu, p, r, J, R, TRUE)
+dM0_nb_vec(ymatv, mu, p, r, J_i, R, TRUE)
 
 
 

@@ -31,12 +31,12 @@ gM0nb <- function (param) {
 }
 
 # generate with negbin mixing
-
+# edited to transform the parameters so as to align with density function
 gM0nbgen <- function (param) {
 
-  mu <- param[1]
-  p  <- param[2]
-  r  <- param[3]
+  mu   <- exp(param[1])
+  p    <- expit(param[2])
+  r    <- exp(param[3])
   ymat <- matrix(0, R, J+1)
 
   prob <- c(p, (1 - p) * p, (1 - p)^2 * p, (1 - p)^3)
