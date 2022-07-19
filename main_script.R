@@ -71,7 +71,7 @@ b0 <- 3.077
 b1 <- 0.101
 
 param <- c(b0, b1, pt, rt)
-xvec <- read.table("xvec50.txt")
+xvec <- read.table("xvec.txt")
 xvec <- as.matrix(xvec)
 
 
@@ -154,8 +154,65 @@ gM3nbgen(param, J, R, tvec)
 set.seed(123)
 rM3_nb(1, mut, g0, g1, rt, J, R, tvec)
 
+
 gM3nb(param, ymat, J, R, tvec)
 dM3_nb(ymat, mut, g0, g1, rt, J, R, tvec, TRUE)
 
+
+
+###################################
+#           M12                   #
+###################################
+
+source("m12_haines.R")
+source("m12_nimble.R")
+
+
+param <- c(b0, b1, g0, g1, rt)
+tvec <- read.table("tvec.txt")
+tvec <- as.matrix(tvec)
+
+
+ymat  <- gM12nbgen(param, J, R, xvec, tvec)
+
+
+gM12nb(param, ymat, J, R, xvec, tvec)
+dM12_nb(ymat, b0, b1, g0, g1, rt, J, R, xvec, tvec, TRUE)
+
+set.seed(123)
+gM12nbgen(param, J, R, xvec, tvec)
+set.seed(123)
+rM12_nb(1, b0, b1, g0, g1, rt, J, R, xvec, tvec)
+
+###################################
+#           M123                  #
+###################################
+
+source("m123_haines.R")
+source("m123_nimble.R")
+
+g1 <- 0.125
+g2 <- 0.125
+param <- c(b0, b1, g0, g1, g2, rt)
+
+
+tvecR <- read.table("tvec.txt")
+tvecR <- as.matrix(tvecR)
+tvecJ <- read.table("tvec3.txt")
+tvecJ <- as.matrix(tvecJ)
+
+
+ymat  <- gM123nbgen(param, J, R, xvec, tvecR, tvecJ)
+
+
+gM123nb(param, ymat, J, R, xvec, tvecR, tvecJ)
+
+dM123_nb(ymat, b0, b1, g0, g1, g2, rt, J, R, xvec, tvecR, tvecJ, TRUE)
+
+
+set.seed(123)
+gM123nbgen(param, J, R, xvec, tvecR, tvecJ)
+set.seed(123)
+rM123_nb(1, b0, b1, g0, g1, g2, rt, J, R, xvec, tvecR, tvecJ)
 
 

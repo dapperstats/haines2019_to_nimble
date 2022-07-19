@@ -11,23 +11,30 @@
 ##########################################
 
 
-dM12_nb <- nimbleFunction (
+# and
+
+#############################################
+# Model 3: removal covariates for capture   #
+#############################################
+
+dM123_nb <- nimbleFunction (
   run = function (x   = double(2),
                   b0  = double(),
                   b1  = double(),
                   g0  = double(),
                   g1  = double(),
+                  g2  = double(),
                   rt  = double(),
                   J   = integer(),
                   R   = integer(),
                   z   = double(1),
-                  w   = double(1), 
+                  wR  = double(1), 
+                  wJ  = double(1), 
                   log = logical(0, default = 0)) {
 
 
   mu   <- exp(b0 + b1 * z)
-  pt   <- g0 + g1 * w
-  p    <- expit(pt)
+
 
   r    <- exp(rt)
 
@@ -49,9 +56,12 @@ dM12_nb <- nimbleFunction (
 
   for (i in 1:R) {
 
+    p    <- expit(g0 + g1 * wR[i] + g2 * wJ)
+    pp <- c(0, p)
+
     prob <- numeric(J)
     for (j in 1:J) {
-      prob[j] <- pow(1 - p[i], j - 1) * p[i]
+      prob[j] <- prod(1 - pp[1:j])*p[j]
     }
     ptot <- sum(prob)
 
@@ -68,22 +78,22 @@ dM12_nb <- nimbleFunction (
 })
 
 
-rM12_nb <- nimbleFunction(
+rM123_nb <- nimbleFunction(
   run = function(n  = integer(),
                  b0 = double(),
                  b1 = double(),
                  g0  = double(),
                  g1  = double(),
+                 g2  = double(),
                  rt = double(),
                  J  = integer(), 
                  R  = integer(),
                  z  = double(1),
-                 w  = double(1)) {
+                 wR = double(1),
+                 wJ = double(1)) {
 
-    mut <- b0 + b1 * z
-    mu   <- exp(mut)
-    pt   <- g0 + g1 * w
-    p    <- expit(pt)
+
+    mu   <- exp(b0 + b1 * z)
 
     r    <- exp(rt)
     
@@ -93,9 +103,13 @@ rM12_nb <- nimbleFunction(
       n <- rnbinom(n = 1, size = r, mu = mu[i])
       if (n > 0) {
 
+        p    <- expit(g0 + g1 * wR[i] + g2 * wJ)
+        pp <- c(0, p)
+
         prob <- double(J + 1)
         for (j in 1:J) {
-          prob[j] <- pow(1 - p[i], j - 1) * p[i]
+          prob[j] <- prod(1 - pp[1:j]) * p[j]
+
         }
         prob[J + 1] <- 1 - sum(prob[1:J])
 
@@ -108,20 +122,22 @@ rM12_nb <- nimbleFunction(
 })
 
 registerDistributions(list(
-  dM12_nb = list(
-    BUGSdist = "dM12_nb(b0, b1, g0, g1, rt, J, R, z, w)",
-    Rdist = "dM12_nb(b0, b1, g0, g1, rt, J, R, z, w)",
+  dM123_nb = list(
+    BUGSdist = "dM123_nb(b0, b1, g0, g1, g2, rt, J, R, z, wR, wJ)",
+    Rdist = "dM123_nb(b0, b1, g0, g1, g2, rt, J, R, z, wR, wJ)",
     discrete = TRUE,
     types = c('value = double(2)',
               'b0  = double()',
               'b1  = double()',
               'g0  = double()',
               'g1  = double()',
+              'g2  = double()',
               'rt  = double()',
               'J = integer()',
               'R = integer()',
               'z = double(1)',
-              'w = double(1)'
+              'wR = double(1)',
+              'wJ = double(1)'
               ),
     mixedSizes = FALSE,
     pqAvail = FALSE
