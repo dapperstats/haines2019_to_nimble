@@ -55,8 +55,8 @@ gM1nbgen <- function (param, J, R, xvec) {
 
   ymat <- matrix(0, R, J + 1)
   prob <- numeric(J + 1)
-  for (i in 1:(J)) {
-    prob[i] <- pow(1 - p, i - 1) * p
+  for (j in 1:J) {
+    prob[j] <- pow(1 - p, j - 1) * p
   }
   prob[J + 1] <- 1 - sum(prob[1:J])
 

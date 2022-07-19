@@ -34,7 +34,7 @@ rt  <- log(r)
 
 param <- c(mut, pt, rt)
 
-ymat  <- matrix(gM0nbgen(param, J, R), nrow = R, ncol = J)
+ymat  <- gM0nbgen(param, J, R)
 ymatv <- as.numeric(t(ymat))
 
 gM0nb(param, ymat, J, R)
@@ -75,7 +75,7 @@ xvec <- read.table("xvec50.txt")
 xvec <- as.matrix(xvec)
 
 
-ymat  <- matrix(gM1nbgen(param, J, R, xvec), ncol = J, nrow = R)
+ymat  <- gM1nbgen(param, J, R, xvec)
 
 
 gM1nb(param, ymat, J, R, xvec)
@@ -108,38 +108,27 @@ rNmixture_MNB_sitecovar_s(1, b0, b1, pt, rt, J, xvec[1])
 #           M2                    #
 ###################################
 
-
-
 source("m2_haines.R")
 
+g0 <- -2
+g1 <- 0.25
 
 
-mu  <- 28.048
-r   <- 4
-g0t <- -2
-g1t <- 0.25
-mut <- log(mu)
-rt <- log(r)
-
-
-
-param <- c(mut, g0t, g1t, rt)
+param <- c(mut, g0, g1, rt)
 tvec <- read.table("tvec.txt")
 tvec <- as.matrix(tvec)
 
+ymat  <- gM2nbgen(param, J, R, tvec)
 
-R <- 20
-J <- 3
-ymat  <- matrix(gM2nbgen(param), ncol = 3)
 
-  yrow      <- rowSums(ymat)
-  ycol      <- colSums(ymat)
-  ytot      <- sum(sum(ymat))
-  jvec      <- seq(0, J - 1)
-  ysumj     <- sum(ycol * jvec)
-  ylogfact  <- sum(sum(log(factorial(ymat))))
-  yrlogfact <- sum(log(factorial(yrow)))
+set.seed(123)
+gM2nbgen(param, J, R, tvec)
+set.seed(123)
+rM2_nb(1, mut, g0, g1, rt, J, R, tvec)
 
-param0 <- c(mu, g0t, g1t, rt)
-gM2nb(param0)
+gM2nb(param, ymat, J, R, tvec)
+dM2_nb(ymat, mut, g0, g1, rt, J, R, tvec, TRUE)
+
+
+
 
