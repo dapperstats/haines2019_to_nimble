@@ -216,3 +216,91 @@ set.seed(123)
 rM123_nb(1, b0, b1, g0, g1, g2, rt, J, R, xvec, tvecR, tvecJ)
 
 
+###############################################################
+
+# wrapping into an analysis
+
+R  <- 20
+J  <- 3
+set.seed(125)
+
+p   <- 0.61
+mu  <- 28.048
+r   <- 11.415
+
+pt  <- logit(p)
+mut <- log(mu)
+rt  <- log(r)
+
+# showing that the likelihood calculation works properly in absence of prior
+
+# Define code for a nimbleModel
+ nc <- nimbleCode({
+   x[1:J] ~ dNmixture_MNB_s(mut = log(mu), pt = logit(p), rt = rt, J = J)
+
+ })
+
+# Build the model
+nmix <- nimbleModel(nc,
+                    constants = list(J = J),
+                    data = list(x = ymatv),
+                    inits = list(mu = mu,
+                                 p = p,
+                                 rt = rt))
+nmix$calculate()
+
+dNmixture_MNB_s(ymatv, mut, pt, rt, J, log = 1)
+
+
+
+# including param uncertainty
+
+# Define code for a nimbleModel
+ nc <- nimbleCode({
+   x[1:J] ~ dNmixture_MNB_s(mut = log(mu), pt = logit(p), rt = log(r), J = J)
+
+   mu ~ dunif(0, 100)
+   p  ~ dunif(0, 1)
+   r  ~ dunif(0, 100)
+ })
+
+# Build the model
+nmix <- nimbleModel(nc,
+                    constants = list(J = J),
+                    data = list(x = ymatv),
+                    inits = list(mu = mu,
+                                 p = p,
+                                 r = r))
+nmix$calculate()
+
+
+
+
+# building carcass versions
+
+
+###################################
+#           M0                    #
+###################################
+
+
+source("m0_carcass.R")
+
+R  <- 20
+J  <- 3
+set.seed(125)
+
+omega <- 0.61
+alpha <- 28.048
+r     <- 11.415
+
+omegat  <- logit(omega)
+alphat  <- log(alpha)
+rt      <- log(r)
+param   <- c(alphat, omegat, rt)
+
+
+set.seed(123)
+rM0_nb_carcass(1, alphat, omegat, rt, J, R)
+set.seed(123)
+gM0nbgen(param, J, R)
