@@ -55,7 +55,7 @@ rNmixture_MNB_s(1, mut, pt, rt, J)
 set.seed(123)
 rM0_nb_vec(1, mut, pt, rt, J_i, R)
 set.seed(123)
-matrix(gM0nbgen(param, J, R), nrow = R, ncol = J)
+gM0nbgen(param, J, R)
 
 
 ###################################
