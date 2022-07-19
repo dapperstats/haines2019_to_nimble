@@ -1,4 +1,13 @@
+rm(list = ls())
+
 library(nimble)
+
+logit <- function (x) {
+   log(x / (1 - x))
+}
+expit <- function (x) { 
+  exp(x) / (1 + exp(x))
+}
 
 ###################################
 #           M0                    #
@@ -9,7 +18,7 @@ source("m0_nimble.R")
 source("m0_nimble_gen.R")
 source("m0_nimbleEcology.R")
 
-R  <- 1
+R  <- 20
 J  <- 3
 J_i <- rep(J, R)
 set.seed(125)
@@ -17,6 +26,7 @@ set.seed(125)
 p   <- 0.61
 mu  <- 28.048
 r   <- 11.415
+
 pt  <- logit(p)
 mut <- log(mu)
 rt  <- log(r)
@@ -24,32 +34,29 @@ rt  <- log(r)
 
 param <- c(mut, pt, rt)
 
-ymat  <- matrix(gM0nbgen(param),nrow = 1, ncol = 3)
+ymat  <- matrix(gM0nbgen(param, J, R), nrow = R, ncol = J)
 ymatv <- as.numeric(t(ymat))
 
-
-  yrow      <- as.matrix(rowSums(ymat))
-  ycol      <- as.matrix(colSums(ymat))
-  ytot      <- sum(sum(ymat))
-  jvec      <- seq(0, J - 1)
-  ysumj     <- sum(ycol * jvec)
-  ylogfact  <- sum(sum(log(factorial(ymat))))
-  yrlogfact <- sum(log(factorial(yrow)))
-
-gM0nb(param)
-
-dM0_nb(ymat, mu, p, r, J, R, TRUE)
-dM0_nb_vec(ymatv, mu, p, r, J_i, R, TRUE)
+gM0nb(param, ymat, J, R)
+dM0_nb(ymat, mut, pt, rt, J, R, TRUE)
+dM0_nb_vec(ymatv, mut, pt, rt, J_i, R, TRUE)
 
 
-dNmixture_MNB_s(ymat[1, ], mu, p, r, J, TRUE)
-dM0_nb(ymat[1, , drop = FALSE], mu, p, r, J, 1, TRUE)
+dNmixture_MNB_s(ymat[1, ], mut, pt, rt, J, TRUE)
+dM0_nb(ymat[1, , drop = FALSE], mut, pt, rt, J, 1, TRUE)
+gM0nb(param, ymat[1, , drop = FALSE], J, 1)
+dM0_nb_vec(ymat[1, ], mut, pt, rt, J, 1, TRUE)
 
 
 set.seed(123)
-rM0_nb(1, mu, p, r, J, R)
+rM0_nb(1, mut, pt, rt, J, R)
 set.seed(123)
-rNmixture_MNB_s(1, mu, p, r, J)
+rNmixture_MNB_s(1, mut, pt, rt, J)
+set.seed(123)
+rM0_nb_vec(1, mut, pt, rt, J_i, R)
+set.seed(123)
+matrix(gM0nbgen(param, J, R), nrow = R, ncol = J)
+
 
 ###################################
 #           M1                    #
@@ -60,47 +67,39 @@ source("m1_nimble.R")
 source("m1_nimbleEcology.R")
 
 
-p   <- 0.61
-b0  <- 21.693
-b1  <- 0.101
-r   <- 4
-pt  <- logit(p)
-rt  <- log(r)
-b0t <- log(b0)
-b1t <- b1
+b0 <- 3.077
+b1 <- 0.101
 
-
-param <- c(b0t, b1t, pt, rt)
+param <- c(b0, b1, pt, rt)
 xvec <- read.table("xvec50.txt")
-xvec <- as.matrix(xvec)[1]
+xvec <- as.matrix(xvec)
 
-R <- 1
-J <- 3
-ymat  <- matrix(gM1nbgen(param), ncol = 3)
 
-  yrow      <- rowSums(ymat)
-  ycol      <- colSums(ymat)
-  ytot      <- sum(sum(ymat))
-  jvec      <- seq(0, J - 1)
-  ysumj     <- sum(ycol * jvec)
-  ylogfact  <- sum(sum(log(factorial(ymat))))
-  yrlogfact <- sum(log(factorial(yrow)))
+ymat  <- matrix(gM1nbgen(param, J, R, xvec), ncol = J, nrow = R)
 
-param0 <- c(b0t, b1t, pt, rt)
-gM1nb(param0)
 
-dM1_nb(ymat, b0, b1, p, r, J, R, xvec,TRUE)
+gM1nb(param, ymat, J, R, xvec)
 
-ymatv <- as.numeric(ymat)
+dM1_nb(ymat, b0, b1, pt, rt, J, R, xvec, TRUE)
 
-dNmixture_MNB_sitecovar_s(ymatv, b0, b1, p, r, J, xvec,TRUE)
+ymatv <- as.numeric(ymat[1, ])
+
+gM1nb(param, ymat[1, , drop = FALSE], J, 1, xvec[1])
+dM1_nb(ymat[1, , drop = FALSE], b0, b1, pt, rt, J, 1, xvec[1], TRUE)
+dNmixture_MNB_sitecovar_s(ymatv, b0, b1, pt, rt, J, xvec[1], TRUE)
 
 
 set.seed(123)
-rM1_nb(1, b0, b1, p, r, J, R, xvec)
+gM1nbgen(param, J, R, xvec)
+set.seed(123)
+rM1_nb(1, b0, b1, pt, rt, J, R, xvec)
 
 set.seed(123)
-rNmixture_MNB_sitecovar_s(1, b0, b1, p, r, J, xvec)
+gM1nbgen(param, J, 1, xvec[1])
+set.seed(123)
+rM1_nb(1, b0, b1, pt, rt, J, 1, xvec[1])
+set.seed(123)
+rNmixture_MNB_sitecovar_s(1, b0, b1, pt, rt, J, xvec[1])
 
 
 
@@ -110,4 +109,37 @@ rNmixture_MNB_sitecovar_s(1, b0, b1, p, r, J, xvec)
 ###################################
 
 
+
+source("m2_haines.R")
+
+
+
+mu  <- 28.048
+r   <- 4
+g0t <- -2
+g1t <- 0.25
+mut <- log(mu)
+rt <- log(r)
+
+
+
+param <- c(mut, g0t, g1t, rt)
+tvec <- read.table("tvec.txt")
+tvec <- as.matrix(tvec)
+
+
+R <- 20
+J <- 3
+ymat  <- matrix(gM2nbgen(param), ncol = 3)
+
+  yrow      <- rowSums(ymat)
+  ycol      <- colSums(ymat)
+  ytot      <- sum(sum(ymat))
+  jvec      <- seq(0, J - 1)
+  ysumj     <- sum(ycol * jvec)
+  ylogfact  <- sum(sum(log(factorial(ymat))))
+  yrlogfact <- sum(log(factorial(yrow)))
+
+param0 <- c(mu, g0t, g1t, rt)
+gM2nb(param0)
 

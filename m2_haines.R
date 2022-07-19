@@ -6,7 +6,7 @@ logit <- function(x){ log(x/(1-x)) }
 expit <- function(x){ exp(x)/(1+exp(x)) }
 
 ##########################################
-# Model 1: site covariates for capture   #
+# Model 2: site covariates for capture   #
 ##########################################
 
 # fit negative binomial
@@ -41,21 +41,25 @@ gM2nb <- function (param) {
 
 
 # generate with negbin 
+# edited to transform the parameters so as to align with density function
 
 gM2nbgen <- function (param) {
 
-  b0 <- param[1]
-  b1 <- param[2]
-  p  <- expit(param[3])
-  r  <- exp(param[4])
+  mu   <- exp(param[1])
+  r    <- exp(param[4])
+
+  g0t <- param[2]
+  g1t <- param[3]
+  p  <- expit(g0t + g1t * tvec)
+
   ymat <- matrix(0, R, J + 1)
-  prob <- c(p, (1 - p) * p,(1 - p)^2 * p, (1 - p)^3)
 
   for(i in 1:R) {
-    mui <- exp(b0 + b1 * xvec[i])
-    n   <- rnbinom(1, size = r, mu = mui)
+    n   <- rnbinom(1, size = r, mu = mu)
     if(n > 0) {
-      ymat[i,] <- rmultinom(1, n, prob)
+      probi <- c(p[i], (1 - p[i]) * p[i], (1 - p[i])^2 * p[i], (1 - p[i])^3)
+
+      ymat[i,] <- rmultinom(1, n, probi)
     }
   }
   ymat <- ymat[,1:J]

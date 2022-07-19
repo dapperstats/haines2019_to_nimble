@@ -5,12 +5,16 @@
 
 dM0_nb_vec <- nimbleFunction (
   run = function (x   = double(1),
-                  mu  = double(),
-                  p   = double(),
-                  r   = double(),
+                  mut = double(),
+                  pt  = double(),
+                  rt  = double(),
                   J_i = integer(1),
                   R   = integer(),
                   log = logical(0, default = 0)) {
+
+  mu   <- exp(mut)
+  p    <- expit(pt)
+  r    <- exp(rt)
 
   xtot       <- sum(x)
   ptot       <- double(R)
@@ -54,11 +58,15 @@ dM0_nb_vec <- nimbleFunction (
 
 rM0_nb_vec <- nimbleFunction(
   run = function(n    = integer(),
-                 mu   = double(),
-                 p    = double(),
-                 r    = double(),
+                 mut  = double(),
+                 pt   = double(),
+                 rt   = double(),
                  J_i  = integer(1), 
                  R    = integer()) {
+
+    mu   <- exp(mut)
+    p    <- expit(pt)
+    r    <- exp(rt)
 
     J_tot <- sum(J_i)    
     
@@ -99,13 +107,13 @@ rM0_nb_vec <- nimbleFunction(
 
 registerDistributions(list(
   dM0_nb_vec = list(
-    BUGSdist = "dM0_nb_vec(mu, p, r, J_i, R)",
-    Rdist = "dM0_nb_vec(mu, p, r, J_i, R)",
+    BUGSdist = "dM0_nb_vec(mut, pt, rt, J_i, R)",
+    Rdist = "dM0_nb_vec(mut, pt, rt, J_i, R)",
     discrete = TRUE,
     types = c('value = double(1)',
-              'mu = double()',
-              'p = double()',
-              'r = double()',
+              'mut = double()',
+              'pt = double()',
+              'rt = double()',
               'J = integer(1)',
               'R = integer()'
               ),

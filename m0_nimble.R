@@ -7,13 +7,16 @@
 
 dM0_nb <- nimbleFunction (
   run = function (x   = double(2),
-                  mu  = double(),
-                  p   = double(),
-                  r   = double(),
+                  mut = double(),
+                  pt  = double(),
+                  rt  = double(),
                   J   = integer(),
                   R   = integer(),
                   log = logical(0, default = 0)) {
 
+  mu   <- exp(mut)
+  p    <- expit(pt)
+  r    <- exp(rt)
 
   ptot <- 1 - (1 - p)^J
 
@@ -45,13 +48,16 @@ dM0_nb <- nimbleFunction (
 
 
 rM0_nb <- nimbleFunction(
-  run = function(n  = integer(),
-                 mu = double(),
-                 p  = double(),
-                 r  = double(),
-                 J  = integer(), 
-                 R  = integer()) {
+  run = function(n   = integer(),
+                 mut = double(),
+                 pt  = double(),
+                 rt  = double(),
+                 J   = integer(), 
+                 R   = integer()) {
 
+    mu   <- exp(mut)
+    p    <- expit(pt)
+    r    <- exp(rt)
     
     prob <- double(J + 1)
     for (i in 1:(J)) {
@@ -73,13 +79,13 @@ rM0_nb <- nimbleFunction(
 
 registerDistributions(list(
   dM0_nb = list(
-    BUGSdist = "dM0_nb(mu, p, r, J, R)",
-    Rdist = "dM0_nb(mu, p, r, J, R)",
+    BUGSdist = "dM0_nb(mut, pt, rt, J, R)",
+    Rdist = "dM0_nb(mut, pt, rt, J, R)",
     discrete = TRUE,
     types = c('value = double(2)',
-              'mu = double()',
-              'p = double()',
-              'r = double()',
+              'mut = double()',
+              'pt = double()',
+              'rt = double()',
               'J = integer()',
               'R = integer()'
               ),

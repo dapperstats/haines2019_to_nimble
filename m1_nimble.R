@@ -15,15 +15,17 @@ dM1_nb <- nimbleFunction (
   run = function (x   = double(2),
                   b0  = double(),
                   b1  = double(),
-                  p   = double(),
-                  r   = double(),
+                  pt  = double(),
+                  rt  = double(),
                   J   = integer(),
                   R   = integer(),
                   z   = double(1), 
                   log = logical(0, default = 0)) {
 
-  zb  <- log(b0) + b1 * z
-  mu  <- exp(zb)
+  mut <- b0 + b1 * z
+  mu   <- exp(mut)
+  p    <- expit(pt)
+  r    <- exp(rt)
 
   ptot <- 1 - (1 - p)^J
 
@@ -45,7 +47,7 @@ dM1_nb <- nimbleFunction (
   for (i in 1:R) {
 
     term1   <- lgamma(r + x_row[i]) - lgamma(r)
-    term2   <- r * log(r) + x_row[i] * zb[i]
+    term2   <- r * log(r) + x_row[i] * mut[i]
     term3   <- x_row[i] * log(p) + x_miss_row[i] * log(1 - p)
     term4   <- -(x_row[i] + r) * log(r + mu[i] * ptot)
     logProb <- logProb + term1 + term2 + term3 + term4
@@ -59,16 +61,18 @@ dM1_nb <- nimbleFunction (
 
 rM1_nb <- nimbleFunction(
   run = function(n  = integer(),
-                 b0  = double(),
-                 b1  = double(),
-                 p  = double(),
-                 r  = double(),
+                 b0 = double(),
+                 b1 = double(),
+                 pt = double(),
+                 rt = double(),
                  J  = integer(), 
                  R  = integer(),
-                 z   = double(1)) {
+                 z  = double(1)) {
 
-    zb  <- log(b0) + b1 * z
-    mu  <- exp(zb)
+    mut <- b0 + b1 * z
+    mu   <- exp(mut)
+    p    <- expit(pt)
+    r    <- exp(rt)
     
     prob <- double(J + 1)
     for (i in 1:(J)) {
@@ -91,14 +95,14 @@ rM1_nb <- nimbleFunction(
 
 registerDistributions(list(
   dM1_nb = list(
-    BUGSdist = "dM1_nb(b0, b1, p, r, J, R, z)",
-    Rdist = "dM1_nb(b0, b1, p, r, J, R, z)",
+    BUGSdist = "dM1_nb(b0, b1, pt, rt, J, R, z)",
+    Rdist = "dM1_nb(b0, b1, pt, rt, J, R, z)",
     discrete = TRUE,
     types = c('value = double(2)',
-              'b0 = double()',
-              'b1 = double()',
-              'p = double()',
-              'r = double()',
+              'b0  = double()',
+              'b1  = double()',
+              'pt  = double()',
+              'rt  = double()',
               'J = integer()',
               'R = integer()',
               'z = double(1)'

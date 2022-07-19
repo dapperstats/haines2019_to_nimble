@@ -12,11 +12,15 @@
 
 dNmixture_MNB_s <- nimbleFunction(
     run = function(x   = double(1),
-                   mu  = double(),
-                   p   = double(),
-                   r   = double(),
+                   mut = double(),
+                   pt  = double(),
+                   rt  = double(),
                    J   = integer(),
                    log = integer(0, default = 0)) {
+
+  mu   <- exp(mut)
+  p    <- expit(pt)
+  r    <- exp(rt)
 
   x_tot <- sum(x)
   x_miss <- sum(x * seq(0, J - 1))
@@ -35,12 +39,15 @@ dNmixture_MNB_s <- nimbleFunction(
 
 
 rNmixture_MNB_s <- nimbleFunction(
-  run = function(n  = integer(),
-                 mu = double(),
-                 p  = double(),
-                 r  = double(),
-                 J  = integer()) {
+  run = function(n   = integer(),
+                 mut = double(),
+                 pt  = double(),
+                 rt  = double(),
+                 J   = integer()) {
 
+    mu   <- exp(mut)
+    p    <- expit(pt)
+    r    <- exp(rt)
     
     prob <- double(J + 1)
     for (i in 1:(J)) {
@@ -60,13 +67,13 @@ rNmixture_MNB_s <- nimbleFunction(
 
 registerDistributions(list(
   dNmixture_MNB_s = list(
-    BUGSdist = "dNmixture_MNB_s(mu, p, r, J)",
-    Rdist = "dNmixture_MNB_s(mu, p, r, J)",
+    BUGSdist = "dNmixture_MNB_s(mut, pt, rt, J)",
+    Rdist = "dNmixture_MNB_s(mut, pt, rt, J)",
     discrete = TRUE,
     types = c('value = double(1)',
-              'mu = double()',
-              'p = double()',
-              'r = double()',
+              'mut = double()',
+              'pt = double()',
+              'rt = double()',
               'J = integer()'
               ),
     mixedSizes = FALSE,
