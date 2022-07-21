@@ -513,3 +513,50 @@ dM123_nb_vec(ymatv_uneven, b0, b1, g0, g1, g2, rt, J_i_uneven, R, xvec, tvecR_un
 
 
 
+
+
+
+
+nc <- nimbleCode({
+
+   pt_j[1:J_tot] <- g0 + g1 * wR[1:J_tot] + g2 * wJ[1:J_tot]
+
+   for (i in 1:R) {
+     mut_i[i] <- b0 + b1 * z[i] 
+     x[spot1[i]:spot2[i]] ~ dNmixture_MNB_v(mut = mut_i[i], pt = pt_j[spot1[i]:spot2[i]], rt = rt, J = J_i[i])
+   }
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i, R = R, spot1 = spot1, spot2 = spot2, J_tot = J_tot),
+                    data = list(x = ymatv, z = xvec[,1], wR = tvecR_even, wJ = tvecJ_even),
+                    inits = list(b0 = b0,
+                                 b1 = b1,
+                                 g0 = g0,
+                                 g1 = g1,
+                                 g2 = g2,
+                                 rt = rt))
+nmix$calculate()
+
+dM123_nb_vec(ymatv, b0, b1, g0, g1, g2, rt, J_i, R, xvec, tvecR_even, tvecJ_even, TRUE)
+
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i_uneven, R = R, spot1 = spot1_uneven, spot2 = spot2_uneven, J_tot = J_tot_uneven),
+                    data = list(x = ymatv_uneven, z = xvec[,1], wR = tvecR_uneven, wJ = tvecJ_uneven),
+                    inits = list(b0 = b0,
+                                 b1 = b1,
+                                 g0 = g0,
+                                 g1 = g1,
+                                 g2 = g2,
+                                 rt = rt))
+
+nmix$calculate()
+dM123_nb_vec(ymatv_uneven, b0, b1, g0, g1, g2, rt, J_i_uneven, R, xvec, tvecR_uneven, tvecJ_uneven, TRUE)
+
+
+
+
+
