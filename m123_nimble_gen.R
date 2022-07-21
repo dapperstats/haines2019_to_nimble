@@ -50,7 +50,7 @@ dM123_nb_vec <- nimbleFunction (
 
   for (i in 1:R) {
 
-    spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]) - J_i[i] + J_i[i])
+    spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]))
     x_row[i]      <- sum(x[spots_in])
     x_miss_row[i] <- x[spots_in] %*% seq(0, J_i[i] - 1)
 
@@ -65,7 +65,7 @@ dM123_nb_vec <- nimbleFunction (
 
   for (i in 1:R) {
 
-    spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]) - J_i[i] + J_i[i])
+    spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]))
 
     x_vec  <- seq(0, J_i[i] - 1)
     p_i <- p[spots_in]
@@ -134,7 +134,7 @@ rM123_nb_vec <- nimbleFunction(
         retain[sum(J_i[1:i]) - J_i[i] + i - 1 + j] <- TRUE
  
       }
-      prob[sum(J_i[1:i]) - J_i[i] + i - 1 + j + 1] <- 1 - sum(prob[(sum(J_i[1:i]) - J_i[i] + i - 1 + 1):(sum(J_i[1:i]) - J_i[i] + i - 1 + J_i[i])])
+      prob[sum(J_i[1:i]) - J_i[i] + i + j] <- 1 - sum(prob[(sum(J_i[1:i]) - J_i[i] + i):(sum(J_i[1:i]) + i - 1)])
     }
 
 
@@ -146,7 +146,7 @@ rM123_nb_vec <- nimbleFunction(
 
       if (n[i] > 0) {
 
-        ans[(sum(J_i[1:i]) - J_i[i] + i - 1):(sum(J_i[1:i]) - J_i[i] + i - 1 + J_i[i]) + 1] <- rmulti(n = 1, size = n[i], prob = prob[(sum(J_i[1:i]) - J_i[i] + i - 1):(sum(J_i[1:i]) - J_i[i] + i - 1 + J_i[i]) + 1])
+        ans[(sum(J_i[1:i]) - J_i[i] + i):(sum(J_i[1:i]) + i)] <- rmulti(n = 1, size = n[i], prob = prob[(sum(J_i[1:i]) - J_i[i] + i):(sum(J_i[1:i]) + i)])
 
       }
 

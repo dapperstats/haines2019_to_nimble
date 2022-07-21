@@ -275,13 +275,12 @@ rt  <- log(r)
 
 # showing that the likelihood calculation works properly in absence of prior
 
-# Define code for a nimbleModel
- nc <- nimbleCode({
+nc <- nimbleCode({
    x[1:J] ~ dNmixture_MNB_s(mut = log(mu), pt = logit(p), rt = rt, J = J)
 
  })
 
-# Build the model
+
 nmix <- nimbleModel(nc,
                     constants = list(J = J),
                     data = list(x = ymatv),
@@ -290,62 +289,7 @@ nmix <- nimbleModel(nc,
                                  rt = rt))
 nmix$calculate()
 
-dNmixture_MNB_s(ymatv, mut, pt, rt, J, log = 1)
+dNmixture_MNB_s(ymatv[1:J], mut, pt, rt, J, log = 1)
+dM0_nb_vec(ymat[1, ], mut, pt, rt, J, 1, TRUE)
 
 
-
-# including param uncertainty
-
-# Define code for a nimbleModel
- nc <- nimbleCode({
-   x[1:J] ~ dNmixture_MNB_s(mut = log(mu), pt = logit(p), rt = log(r), J = J)
-
-   mu ~ dunif(0, 100)
-   p  ~ dunif(0, 1)
-   r  ~ dunif(0, 100)
- })
-
-# Build the model
-nmix <- nimbleModel(nc,
-                    constants = list(J = J),
-                    data = list(x = ymatv),
-                    inits = list(mu = mu,
-                                 p = p,
-                                 r = r))
-nmix$calculate()
-
-
-
-
-# building carcass versions
-
-
-###################################
-#           M0                    #
-###################################
-
-
-source("m0_carcass.R")
-
-R  <- 20
-J  <- 3
-set.seed(125)
-
-omega <- 0.61
-alpha <- 28.048 # total arrival (across the 3 J)
-alphaper <- alpha / J
-r     <- 11.415
-
-omegat  <- logit(omega)
-alphat  <- log(alphaper) 
-rt      <- log(r)
-
-pt <- omegat
-mut <- log(alpha)
-param   <- c(mut, omegat, rt)
-D <- c(1, 2, 3)
-
-set.seed(123)
-rM0_nb_carcass(1, alphat, omegat, rt, J, R, D)
-set.seed(123)
-gM0nbgen(param, J, R)
