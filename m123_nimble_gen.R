@@ -22,15 +22,15 @@
 # not assuming a rectangular survy design but rather 
 #   using a vector of observations with indexing based on length vector
 
-dM123_nb <- nimbleFunction (
-  run = function (x   = double(2),
+dM123_nb_vec <- nimbleFunction (
+  run = function (x   = double(1),
                   b0  = double(),
                   b1  = double(),
                   g0  = double(),
                   g1  = double(),
                   g2  = double(),
                   rt  = double(),
-                  J   = integer(),
+                  J_i = double(1),
                   R   = integer(),
                   z   = double(1),
                   wR  = double(1), 
@@ -72,7 +72,7 @@ dM123_nb <- nimbleFunction (
 
     term1   <- lgamma(r + x_row[i]) - lgamma(r)
     term2   <- r * log(r) + x_row[i] * log(mu[i])
-    term3   <- sum(ymat[i,] * log(prob))
+    term3   <- sum(x[i,] * log(prob))
     term4   <- -(x_row[i] + r) * log(r + mu[i] * ptot)
     logProb <- logProb + term1 + term2 + term3 + term4
 
@@ -83,16 +83,16 @@ dM123_nb <- nimbleFunction (
 })
 
 
-rM123_nb <- nimbleFunction(
+rM123_nb_vec <- nimbleFunction(
   run = function(n  = integer(),
                  b0 = double(),
                  b1 = double(),
                  g0  = double(),
                  g1  = double(),
                  g2  = double(),
-                 rt = double(),
-                 J  = integer(), 
-                 R  = integer(),
+                 rt  = double(),
+                 J_i = integer(), 
+                 R   = integer(),
                  z  = double(1),
                  wR = double(1),
                  wJ = double(1)) {
@@ -127,18 +127,18 @@ rM123_nb <- nimbleFunction(
 })
 
 registerDistributions(list(
-  dM123_nb = list(
-    BUGSdist = "dM123_nb(b0, b1, g0, g1, g2, rt, J, R, z, wR, wJ)",
-    Rdist = "dM123_nb(b0, b1, g0, g1, g2, rt, J, R, z, wR, wJ)",
+  dM123_nb_vec = list(
+    BUGSdist = "dM123_nb_vec(b0, b1, g0, g1, g2, rt, J_i, R, z, wR, wJ)",
+    Rdist = "dM123_nb_vec(b0, b1, g0, g1, g2, rt, J_i, R, z, wR, wJ)",
     discrete = TRUE,
-    types = c('value = double(2)',
+    types = c('value = double(1)',
               'b0  = double()',
               'b1  = double()',
               'g0  = double()',
               'g1  = double()',
               'g2  = double()',
               'rt  = double()',
-              'J = integer()',
+              'J_i = double(1)',
               'R = integer()',
               'z = double(1)',
               'wR = double(1)',

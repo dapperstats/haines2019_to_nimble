@@ -67,7 +67,7 @@ dM123_nb <- nimbleFunction (
 
     term1   <- lgamma(r + x_row[i]) - lgamma(r)
     term2   <- r * log(r) + x_row[i] * log(mu[i])
-    term3   <- sum(ymat[i,] * log(prob))
+    term3   <- sum(x[i,] * log(prob))
     term4   <- -(x_row[i] + r) * log(r + mu[i] * ptot)
     logProb <- logProb + term1 + term2 + term3 + term4
 

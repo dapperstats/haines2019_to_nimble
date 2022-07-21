@@ -47,7 +47,6 @@ dM2_nb_vec <- nimbleFunction (
 
   logProb <- (-x_logfact) 
 
-  prob <- double(max(J_i))
   for (i in 1:R) {
  
     spots_in      <- (sum(J_i[1:i]) - J_i[i] + 1):(sum(J_i[1:i]) - J_i[i] + J_i[i])
@@ -55,6 +54,7 @@ dM2_nb_vec <- nimbleFunction (
     x_vec  <- seq(0, J_i[i] - 1)
 
    
+    prob <- double(1)
 
     for (j in 1:J_i[i]) {
       prob[j] <- pow(1 - p[i], j - 1) * p[i]

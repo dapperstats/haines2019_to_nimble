@@ -58,6 +58,11 @@ set.seed(123)
 gM0nbgen(param, J, R)
 
 
+J_i_uneven <- rep(2:4, length.out = R)
+ymatv_uneven <- rM0_nb_vec(1, mut, pt, rt, J_i_uneven, R)
+dM0_nb_vec(ymatv_uneven, mut, pt, rt, J_i_uneven, R, TRUE)
+
+
 ###################################
 #           M1                    #
 ###################################
@@ -106,7 +111,8 @@ rM1_nb(1, b0, b1, pt, rt, J, 1, xvec[1])
 set.seed(123)
 rNmixture_MNB_sitecovar_s(1, b0, b1, pt, rt, J, xvec[1])
 
-
+ymatv_uneven <- rM1_nb_vec(1, b0, b1, pt, rt, J_i_uneven, R, xvec)
+dM1_nb_vec(ymatv_uneven, b0, b1, pt, rt, J_i_uneven, R, xvec, TRUE)
 
 
 ###################################
@@ -140,6 +146,9 @@ dM2_nb(ymat, mut, g0, g1, rt, J, R, tvec, TRUE)
 dM2_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec, TRUE)
 
 
+ymatv_uneven <- rM2_nb_vec(1, mut, g0, g1, rt, J_i_uneven, R, tvec)
+dM2_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec, TRUE)
+
 
 
 ###################################
@@ -154,6 +163,7 @@ source("m3_nimble_gen.R")
 param <- c(mut, g0, g1, rt)
 tvec <- read.table("tvec3.txt")
 tvec <- as.matrix(tvec)
+tvec_even <- rep(tvec, length.out = max(J_i))[sequence(J_i)]
 
 
 ymat  <- gM3nbgen(param, J, R, tvec)
@@ -165,12 +175,16 @@ gM3nbgen(param, J, R, tvec)
 set.seed(123)
 rM3_nb(1, mut, g0, g1, rt, J, R, tvec)
 set.seed(123)
-rM3_nb_vec(1, mut, g0, g1, rt, J_i, R, tvec)
+rM3_nb_vec(1, mut, g0, g1, rt, J_i, R, tvec_even)
 
 
 gM3nb(param, ymat, J, R, tvec)
 dM3_nb(ymat, mut, g0, g1, rt, J, R, tvec, TRUE)
-dM3_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec, TRUE)
+dM3_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec_even, TRUE)
+
+tvec_uneven <- rep(tvec, length.out = max(J_i_uneven))[sequence(J_i_uneven)]
+ymatv_uneven <- rM3_nb_vec(1, mut, g0, g1, rt, J_i_uneven, R, tvec_uneven)
+dM3_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec_uneven, TRUE)
 
 
 
@@ -204,6 +218,7 @@ rM12_nb(1, b0, b1, g0, g1, rt, J, R, xvec, tvec)
 
 source("m123_haines.R")
 source("m123_nimble.R")
+source("m123_nimble_gen.R")
 
 g1 <- 0.125
 g2 <- 0.125
@@ -217,12 +232,12 @@ tvecJ <- as.matrix(tvecJ)
 
 
 ymat  <- gM123nbgen(param, J, R, xvec, tvecR, tvecJ)
+ymatv <- as.numeric(t(ymat))
 
 
 gM123nb(param, ymat, J, R, xvec, tvecR, tvecJ)
-
 dM123_nb(ymat, b0, b1, g0, g1, g2, rt, J, R, xvec, tvecR, tvecJ, TRUE)
-
+dM123_nb_vec(ymatv, b0, b1, g0, g1, g2, rt, J_i, R, xvec, tvecR, tvecJ, TRUE)
 
 set.seed(123)
 gM123nbgen(param, J, R, xvec, tvecR, tvecJ)

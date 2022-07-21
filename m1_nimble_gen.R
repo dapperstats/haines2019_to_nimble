@@ -81,7 +81,6 @@ rM1_nb_vec <- nimbleFunction(
     
     J_tot <- sum(J_i)
 
-    prob <- double(J_tot + 1 * R)
 
     prob <- double(J_tot + 1 * R)
     retain <- logical(J_tot + 1 * R)
