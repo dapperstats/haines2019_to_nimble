@@ -64,6 +64,7 @@ gM0nbgen(param, J, R)
 
 source("m1_haines.R")
 source("m1_nimble.R")
+source("m1_nimble_gen.R")
 source("m1_nimbleEcology.R")
 
 
@@ -76,11 +77,13 @@ xvec <- as.matrix(xvec)
 
 
 ymat  <- gM1nbgen(param, J, R, xvec)
+ymatv <- as.numeric(t(ymat))
 
 
 gM1nb(param, ymat, J, R, xvec)
 
 dM1_nb(ymat, b0, b1, pt, rt, J, R, xvec, TRUE)
+dM1_nb_vec(ymatv, b0, b1, pt, rt, J_i, R, xvec, TRUE)
 
 ymatv <- as.numeric(ymat[1, ])
 
@@ -93,6 +96,8 @@ set.seed(123)
 gM1nbgen(param, J, R, xvec)
 set.seed(123)
 rM1_nb(1, b0, b1, pt, rt, J, R, xvec)
+set.seed(123)
+rM1_nb_vec(1, b0, b1, pt, rt, J_i, R, xvec)
 
 set.seed(123)
 gM1nbgen(param, J, 1, xvec[1])
@@ -291,16 +296,20 @@ J  <- 3
 set.seed(125)
 
 omega <- 0.61
-alpha <- 28.048
+alpha <- 28.048 # total arrival (across the 3 J)
+alphaper <- alpha / J
 r     <- 11.415
 
 omegat  <- logit(omega)
-alphat  <- log(alpha)
+alphat  <- log(alphaper) 
 rt      <- log(r)
-param   <- c(alphat, omegat, rt)
 
+pt <- omegat
+mut <- log(alpha)
+param   <- c(mut, omegat, rt)
+D <- c(1, 2, 3)
 
 set.seed(123)
-rM0_nb_carcass(1, alphat, omegat, rt, J, R)
+rM0_nb_carcass(1, alphat, omegat, rt, J, R, D)
 set.seed(123)
 gM0nbgen(param, J, R)
