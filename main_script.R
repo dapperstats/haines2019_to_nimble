@@ -115,6 +115,7 @@ rNmixture_MNB_sitecovar_s(1, b0, b1, pt, rt, J, xvec[1])
 
 source("m2_haines.R")
 source("m2_nimble.R")
+source("m2_nimble_gen.R")
 
 g0 <- -2
 g1 <- 0.25
@@ -125,15 +126,18 @@ tvec <- read.table("tvec.txt")
 tvec <- as.matrix(tvec)
 
 ymat  <- gM2nbgen(param, J, R, tvec)
-
+ymatv <- as.numeric(t(ymat))
 
 set.seed(123)
 gM2nbgen(param, J, R, tvec)
 set.seed(123)
 rM2_nb(1, mut, g0, g1, rt, J, R, tvec)
+set.seed(123)
+rM2_nb_vec(1, mut, g0, g1, rt, J_i, R, tvec)
 
 gM2nb(param, ymat, J, R, tvec)
 dM2_nb(ymat, mut, g0, g1, rt, J, R, tvec, TRUE)
+dM2_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec, TRUE)
 
 
 
