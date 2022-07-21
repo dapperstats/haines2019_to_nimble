@@ -93,7 +93,6 @@ rM3_nb_vec <- nimbleFunction(
     retain <- logical(J_tot + 1 * R)
     ans <- integer(J_tot + 1 * R)
 
-    n <- integer(R)
 
     for (i in 1:R) {
 

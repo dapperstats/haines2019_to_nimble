@@ -7,8 +7,7 @@ tasks
   
  - look into parameter definition for flexible model structure
   - linear predictors
- 
- - turn 123 into a non rectangular
+
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

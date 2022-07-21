@@ -227,8 +227,10 @@ param <- c(b0, b1, g0, g1, g2, rt)
 
 tvecR <- read.table("tvec.txt")
 tvecR <- as.matrix(tvecR)
+tvecR_even <- rep(tvecR, J_i)
 tvecJ <- read.table("tvec3.txt")
 tvecJ <- as.matrix(tvecJ)
+tvecJ_even <- rep(tvecJ, length.out = max(J_i))[sequence(J_i)]
 
 
 ymat  <- gM123nbgen(param, J, R, xvec, tvecR, tvecJ)
@@ -237,12 +239,22 @@ ymatv <- as.numeric(t(ymat))
 
 gM123nb(param, ymat, J, R, xvec, tvecR, tvecJ)
 dM123_nb(ymat, b0, b1, g0, g1, g2, rt, J, R, xvec, tvecR, tvecJ, TRUE)
-dM123_nb_vec(ymatv, b0, b1, g0, g1, g2, rt, J_i, R, xvec, tvecR, tvecJ, TRUE)
+dM123_nb_vec(ymatv, b0, b1, g0, g1, g2, rt, J_i, R, xvec, tvecR_even, tvecJ_even, TRUE)
 
 set.seed(123)
 gM123nbgen(param, J, R, xvec, tvecR, tvecJ)
 set.seed(123)
 rM123_nb(1, b0, b1, g0, g1, g2, rt, J, R, xvec, tvecR, tvecJ)
+set.seed(123)
+rM123_nb_vec(1, b0, b1, g0, g1, g2, rt, J_i, R, xvec, tvecR_even, tvecJ_even)
+
+
+tvecJ_uneven <- rep(tvecJ, length.out = max(J_i_uneven))[sequence(J_i_uneven)]
+tvecR_uneven <- rep(tvecR, J_i_uneven)
+ymatv_uneven <- rM123_nb_vec(1, b0, b1, g0, g1, g2, rt, J_i_uneven, R, xvec, tvecR_uneven, tvecJ_uneven)
+dM123_nb_vec(ymatv_uneven, b0, b1, g0, g1, g2, rt, J_i_uneven, R, xvec, tvecR_uneven, tvecJ_uneven, TRUE)
+
+
 
 
 ###############################################################
