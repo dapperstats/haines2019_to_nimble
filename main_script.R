@@ -148,6 +148,7 @@ dM2_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec, TRUE)
 
 source("m3_haines.R")
 source("m3_nimble.R")
+source("m3_nimble_gen.R")
 
 
 param <- c(mut, g0, g1, rt)
@@ -156,16 +157,20 @@ tvec <- as.matrix(tvec)
 
 
 ymat  <- gM3nbgen(param, J, R, tvec)
+ymatv <- as.numeric(t(ymat))
 
 
 set.seed(123)
 gM3nbgen(param, J, R, tvec)
 set.seed(123)
 rM3_nb(1, mut, g0, g1, rt, J, R, tvec)
+set.seed(123)
+rM3_nb_vec(1, mut, g0, g1, rt, J_i, R, tvec)
 
 
 gM3nb(param, ymat, J, R, tvec)
 dM3_nb(ymat, mut, g0, g1, rt, J, R, tvec, TRUE)
+dM3_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec, TRUE)
 
 
 
