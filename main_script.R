@@ -65,7 +65,7 @@ dM0_nb_vec(ymatv_uneven, mut, pt, rt, J_i_uneven, R, TRUE)
 
 
 nc <- nimbleCode({
-   x[1:J] ~ dNmixture_MNB_s(mut = log(mu), pt = logit(p), rt = rt, J = J)
+   x[1:J] ~ dNmixture_MNB_s(mut = mut, pt = logit(p), rt = rt, J = J)
 
  })
 
@@ -73,7 +73,7 @@ nc <- nimbleCode({
 nmix <- nimbleModel(nc,
                     constants = list(J = J),
                     data = list(x = ymatv[1:J]),
-                    inits = list(mu = mu,
+                    inits = list(mut = mut,
                                  p = p,
                                  rt = rt))
 nmix$calculate()
@@ -92,8 +92,12 @@ nc <- nimbleCode({
    }
  })
 
-     spot1[i] <- (sum(J_i[1:i]) - J_i[i] + 1)
-     spot2[i] <- (sum(J_i[1:i]))
+spot1 <- integer(R)
+spot2 <- integer(R)
+for (i in 1:R) {
+  spot1[i] <- (sum(J_i[1:i]) - J_i[i] + 1)
+  spot2[i] <- (sum(J_i[1:i]))
+}
 
 J_tot <- sum(J_i)
 
@@ -136,7 +140,6 @@ dM0_nb_vec(ymatv_uneven, mut, pt, rt, J_i_uneven, R, TRUE)
 source("m1_haines.R")
 source("m1_nimble.R")
 source("m1_nimble_gen.R")
-source("m1_nimbleEcology.R")
 
 
 b0 <- 3.077
@@ -160,7 +163,6 @@ ymatv <- as.numeric(ymat[1, ])
 
 gM1nb(param, ymat[1, , drop = FALSE], J, 1, xvec[1])
 dM1_nb(ymat[1, , drop = FALSE], b0, b1, pt, rt, J, 1, xvec[1], TRUE)
-dNmixture_MNB_sitecovar_s(ymatv, b0, b1, pt, rt, J, xvec[1], TRUE)
 
 
 set.seed(123)
@@ -174,11 +176,78 @@ set.seed(123)
 gM1nbgen(param, J, 1, xvec[1])
 set.seed(123)
 rM1_nb(1, b0, b1, pt, rt, J, 1, xvec[1])
-set.seed(123)
-rNmixture_MNB_sitecovar_s(1, b0, b1, pt, rt, J, xvec[1])
+
 
 ymatv_uneven <- rM1_nb_vec(1, b0, b1, pt, rt, J_i_uneven, R, xvec)
 dM1_nb_vec(ymatv_uneven, b0, b1, pt, rt, J_i_uneven, R, xvec, TRUE)
+
+
+
+mut_i <- b0 + b1 * xvec
+
+nc <- nimbleCode({
+   x[1:J] ~ dNmixture_MNB_s(mut = mut, pt = logit(p), rt = rt, J = J)
+
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J = J),
+                    data = list(x = ymatv[1:J]),
+                    inits = list(mut = mut_i[1],
+                                 p = p,
+                                 rt = rt))
+nmix$calculate()
+
+dNmixture_MNB_s(ymatv[1:J], mut_i[1], pt, rt, J, log = 1)
+dM0_nb_vec(ymat[1, ], mut_i[1], pt, rt, J, 1, TRUE)
+
+
+
+ymat  <- gM1nbgen(param, J, R, xvec)
+ymatv <- as.numeric(t(ymat))
+
+
+
+
+nc <- nimbleCode({
+
+   for (i in 1:R) {
+ 
+     mut_i[i] <- b0 + b1 * z[i]
+     x[spot1[i]:spot2[i]] ~ dNmixture_MNB_s(mut = mut_i[i], pt = pt, rt = rt, J = J_i[i])
+   }
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i, R = R, spot1 = spot1, spot2 = spot2),
+                    data = list(x = ymatv, z = xvec[,1]),
+                    inits = list(b0 = b0,
+                                 b1 = b1,
+                                 pt = pt,
+                                 rt = rt))
+nmix$calculate()
+
+dM1_nb_vec(ymatv, b0, b1, pt, rt, J_i, R, xvec, TRUE)
+
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i_uneven, R = R, spot1 = spot1_uneven, spot2 = spot2_uneven),
+                    data = list(x = ymatv_uneven, z = xvec[,1]),
+                    inits = list(b0 = b0,
+                                 b1 = b1,
+                                 pt = pt,
+                                 rt = rt))
+
+nmix$calculate()
+dM1_nb_vec(ymatv_uneven, b0, b1, pt, rt, J_i_uneven, R, xvec, TRUE)
+
+
+
+
+
 
 
 ###################################
@@ -217,6 +286,66 @@ dM2_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec, TRUE)
 
 
 
+pt_i <- g0 + g1 * tvec[,1]
+
+
+nc <- nimbleCode({
+   x[1:J] ~ dNmixture_MNB_s(mut = mut, pt = pt, rt = rt, J = J)
+
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J = J),
+                    data = list(x = ymatv[1:J]),
+                    inits = list(mut = mut,
+                                 pt = pt_i[1],
+                                 rt = rt))
+nmix$calculate()
+
+dNmixture_MNB_s(ymatv[1:J], mut, pt_i[1], rt, J, log = 1)
+
+
+ymat  <- gM2nbgen(param, J, R, tvec)
+ymatv <- as.numeric(t(ymat))
+
+
+nc <- nimbleCode({
+
+   for (i in 1:R) {
+ 
+     pt_i[i] <- g0 + g1 * w[i]
+     x[spot1[i]:spot2[i]] ~ dNmixture_MNB_s(mut = mut, pt = pt_i[i], rt = rt, J = J_i[i])
+   }
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i, R = R, spot1 = spot1, spot2 = spot2),
+                    data = list(x = ymatv, w = tvec[,1]),
+                    inits = list(mut = mut,
+                                 g0 = g0,
+                                 g1 = g1,
+                                 rt = rt))
+nmix$calculate()
+
+dM2_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec, TRUE)
+
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i_uneven, R = R, spot1 = spot1_uneven, spot2 = spot2_uneven),
+                    data = list(x = ymatv_uneven, w = tvec[,1]),
+                    inits = list(mut = mut,
+                                 g0 = g0,
+                                 g1 = g1,
+                                 rt = rt))
+
+nmix$calculate()
+dM2_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec, TRUE)
+
+
+
 ###################################
 #           M3                    #
 ###################################
@@ -224,6 +353,7 @@ dM2_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec, TRUE)
 source("m3_haines.R")
 source("m3_nimble.R")
 source("m3_nimble_gen.R")
+source("m3_nimbleEcology.R")
 
 
 param <- c(mut, g0, g1, rt)
@@ -251,6 +381,67 @@ dM3_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec_even, TRUE)
 tvec_uneven <- rep(tvec, length.out = max(J_i_uneven))[sequence(J_i_uneven)]
 ymatv_uneven <- rM3_nb_vec(1, mut, g0, g1, rt, J_i_uneven, R, tvec_uneven)
 dM3_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec_uneven, TRUE)
+
+
+
+
+pt_j <- g0 + g1 * tvec[,1]
+
+
+nc <- nimbleCode({
+   x[1:J] ~ dNmixture_MNB_v(mut = mut, pt = pt[1:3], rt = rt, J = J)
+
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J = J),
+                    data = list(x = ymatv[1:J]),
+                    inits = list(mut = mut,
+                                 pt = pt_j,
+                                 rt = rt))
+nmix$calculate()
+
+dNmixture_MNB_v(ymatv[1:J], mut, pt_j, rt, J, log = 1)
+
+
+
+
+nc <- nimbleCode({
+
+   pt_j[1:J_tot] <- g0 + g1 * w[1:J_tot]
+
+   for (i in 1:R) {
+ 
+     x[spot1[i]:spot2[i]] ~ dNmixture_MNB_v(mut = mut, pt = pt_j[spot1[i]:spot2[i]], rt = rt, J = J_i[i])
+   }
+ })
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i, R = R, spot1 = spot1, spot2 = spot2, J_tot = J_tot),
+                    data = list(x = ymatv, w = tvec_even),
+                    inits = list(mut = mut,
+                                 g0 = g0,
+                                 g1 = g1,
+                                 rt = rt))
+nmix$calculate()
+
+dM3_nb_vec(ymatv, mut, g0, g1, rt, J_i, R, tvec_even, TRUE)
+
+
+
+nmix <- nimbleModel(nc,
+                    constants = list(J_i = J_i_uneven, R = R, spot1 = spot1_uneven, spot2 = spot2_uneven, J_tot = J_tot_uneven),
+                    data = list(x = ymatv_uneven, w = tvec_uneven),
+                    inits = list(mut = mut,
+                                 g0 = g0,
+                                 g1 = g1,
+                                 rt = rt))
+
+nmix$calculate()
+dM3_nb_vec(ymatv_uneven, mut, g0, g1, rt, J_i_uneven, R, tvec_uneven, TRUE)
+
 
 
 
