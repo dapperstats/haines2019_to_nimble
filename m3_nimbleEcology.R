@@ -12,20 +12,16 @@
 
 dNmixture_MNB_v <- nimbleFunction(
     run = function(x   = double(1),
-                   mut = double(),
-                   pt  = double(1),
-                   rt  = double(),
-                   J   = integer(),
+                   mu  = double(),
+                   p   = double(1),
+                   r   = double(),
+                   J   = double(),
                    log = integer(0, default = 0)) {
-
-  mu   <- exp(mut)
-  p    <- expit(pt)
-  r    <- exp(rt)
 
   x_tot <- sum(x)
   x_miss <- sum(x * seq(0, J - 1))
   pp <- c(0, p)
-    prob <- double(J)
+    prob <- numeric(J)
     for (j in 1:J) {
       prob[j] <- prod(1 - pp[1:j]) * p[j]
     }
@@ -45,42 +41,40 @@ dNmixture_MNB_v <- nimbleFunction(
 
 
 rNmixture_MNB_v <- nimbleFunction(
-  run = function(n   = integer(),
-                 mut = double(),
-                 pt  = double(1),
-                 rt  = double(),
-                 J   = integer()) {
+  run = function(n  = integer(),
+                 mu = double(),
+                 p  = double(1),
+                 r  = double(),
+                 J  = double()) {
 
-    mu   <- exp(mut)
-    p    <- expit(pt)
-    r    <- exp(rt)
+
     pp <- c(0, p)
-    prob <- double(J + 1)
+    prob <- numeric(J + 1)
     for (j in 1:J) {
       prob[j] <- prod(1 - pp[1:j]) * p[j]
     }
     prob[J + 1] <- 1 - sum(prob[1:J])
 
-    ans <- integer(J + 1)
-    n <- rnbinom(n = 1, size = r, mu = mu)
+    ans <- numeric(J + 1)
+    n <- rnbinom(n = 1, size = r, prob = 1/(1 + (1/r) * mu))
     if (n > 0) {
       ans <- rmulti(n = 1, size = n, prob = prob)
     }
 
     return(ans[1:J])
-    returnType(integer(1))
+    returnType(double(1))
 })
 
 registerDistributions(list(
   dNmixture_MNB_v = list(
-    BUGSdist = "dNmixture_MNB_v(mut, pt, rt, J)",
-    Rdist = "dNmixture_MNB_v(mut, pt, rt, J)",
+    BUGSdist = "dNmixture_MNB_v(mu, p, r, J)",
+    Rdist = "dNmixture_MNB_v(mu, p, r, J)",
     discrete = TRUE,
     types = c('value = double(1)',
-              'mut = double()',
-              'pt = double(1)',
-              'rt = double()',
-              'J = integer()'
+              'mu = double()',
+              'p = double(1)',
+              'r = double()',
+              'J = double()'
               ),
     mixedSizes = FALSE,
     pqAvail = FALSE
